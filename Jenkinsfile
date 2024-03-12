@@ -16,7 +16,9 @@ pipeline {
                 echo 'test webhook'
             }
         }
-        
+    }
+    }
+/*        
         stage('BUILD and run ') {
             steps {
                 script {
@@ -40,7 +42,7 @@ pipeline {
                 script {   
                     dir("${DEPLOYMENT_FOLDER}/deploiement"){
                       sh "cat ${DEPLOYMENT_FILE}"
-                      sh "sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' ${DEPLOYMENT_FILE}"
+                      sh "sed -i 's/${APP_NAME}.${APP_NAME}:${IMAGE_TAG}/g' ${DEPLOYMENT_FILE}"
                       sh "cat ${DEPLOYMENT_FILE}"
                     }                    
                     sshagent(['ssh-agent']) {
