@@ -40,15 +40,15 @@ pipeline {
         stage('deploiement ') {
             steps {
                 script {   
-                    dir("${DEPLOYMENT_FOLDER}/deploiement"){
+                    dir("${DEPLOYMENT_FOLDER}"){
                       sh "cat ${DEPLOYMENT_FILE}"
                       sh "sed -i 's/${APP_NAME}.${APP_NAME}:${IMAGE_TAG}/g' ${DEPLOYMENT_FILE}"
                       sh "cat ${DEPLOYMENT_FILE}"
                     }                    
                     sshagent(['ssh-agent']) {
-                    sh 'ssh -o StrictHostKeyChecking=no diadji402@10.2.0.2 cd /home/diadji402'
-                    sh "scp ${DEPLOYMENT_FOLDER}/deploiement/* diadji402@10.2.0.2:/home/diadji402"
-                    ansiblePlaybook become: true, installation: 'ansible', inventory: 'ansible/host', playbook: 'ansible/playbook.yaml'
+                    sh 'ssh -o StrictHostKeyChecking=no toumamagcp@10.2.0.2 cd /home/toumamagcp'
+                    sh "scp ${DEPLOYMENT_FOLDER}/* toumamagcp@10.2.0.2:/home/toumamagcp"
+                   // ansiblePlaybook become: true, installation: 'ansible', inventory: 'ansible/host', playbook: 'ansible/playbook.yaml'
                 }
             }
         }
