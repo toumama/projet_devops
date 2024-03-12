@@ -16,8 +16,6 @@ pipeline {
                 echo 'test webhook'
             }
         }
-    }
-    }
 
         stage('BUILD and run ') {
             steps {
