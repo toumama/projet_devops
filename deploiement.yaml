@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: gitops-app
-        image: domoda/devopsgcp:v1.0.2
+        image: toumama/devops:v1.0.2
         ports:
         - containerPort: 80
 
