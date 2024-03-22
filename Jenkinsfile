@@ -35,22 +35,51 @@ pipeline {
                 }
             }
         }
-        stage('deploiement ') {
+
+        stage("deploiement dans l'environnement dev") {
             steps {
                 script {   
-                    dir("${DEPLOYMENT_FOLDER}"){
-                      sh "cat ${DEPLOYMENT_FILE}"
-                      sh "sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' ${DEPLOYMENT_FILE}"
-                      sh "cat ${DEPLOYMENT_FILE}"
-                    }                    
+                                        
                     sshagent(['ssh-agent']) {
                     sh 'ssh -o StrictHostKeyChecking=no toumamagcp@10.2.0.2 cd /home/toumamagcp'
                     sh "scp ${DEPLOYMENT_FOLDER}/* toumamagcp@10.2.0.2:/home/toumamagcp"
-                   // ansiblePlaybook become: true, installation: 'ansible', inventory: 'ansible/host', playbook: 'ansible/playbook.yaml'
-                }
+                    ansiblePlaybook(
+                        become: true,
+                        becomeUser: 'toumamagcp',
+                        credentialsId: 'ssh-agent',
+                        installation: 'ansible',
+                        inventory: 'ansible/host',
+                        playbook: 'ansible/playbook.yaml',
+                        extraVars: [
+                            docker_image_name: "${IMAGE_NAME}",
+                            docker_image_tag: "${IMAGE_TAG}"
+                        ]
+                    )
+                    
+                 }
             }
+        }        
         }
-        
+
+
+      stage("deploiement dans l'environnement prod on gke") {
+          steps {
+            dir("${DEPLOYMENT_FOLDER}"){
+                      sh "cat ${DEPLOYMENT_FILE}"
+                      sh "sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' ${DEPLOYMENT_FILE}"
+                      sh "cat ${DEPLOYMENT_FILE}"                      
+                    }
+            withCredentials([file(credentialsId: 'gke', variable: 'GCLOUD_CREDS')]) {
+              sh '''
+                gcloud version
+                gcloud auth activate-service-account --key-file="$GCLOUD_CREDS"
+                gcloud container clusters get-credentials k8s-cluster --zone us-central1-c --project devops-416716
+                kubectl apply -f  ${DEPLOYMENT_FILE}
+                
+              '''
+            }
+          }
         }
+
     }
 }

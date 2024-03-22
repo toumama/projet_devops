@@ -1,0 +1,2 @@
+[dev]
+10.2.0.2 ansible_connection=ssh ansible_user=diadji402
